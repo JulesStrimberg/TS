@@ -1,1 +1,26 @@
 # TS
+// index.ts
+
+// Création du bouton cadeau
+const giftButton = document.createElement('button');
+giftButton.textContent = '🎁';
+giftButton.style.fontSize = '2em';
+
+// Ajout du bouton à la page
+document.body.appendChild(giftButton);
+
+// Gestionnaire d'événements pour le clic sur le bouton
+giftButton.addEventListener('click', () => {
+  // Création du coeur avec le message
+  const heart = document.createElement('div');
+  heart.textContent = 'Je t\'aime Lucia ❤️';
+  heart.style.position = 'absolute';
+  heart.style.top = `${giftButton.offsetTop + giftButton.offsetHeight}px`;
+  heart.style.left = `${giftButton.offsetLeft + giftButton.offsetWidth / 2}px`;
+  heart.style.transform = 'translate(-50%, 0)';
+  heart.style.fontSize = '1.5em';
+  heart.style.color = 'red';
+
+  // Ajout du coeur à la page
+  document.body.appendChild(heart);
+});
