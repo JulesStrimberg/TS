@@ -18,8 +18,10 @@
     document.head.insertAdjacentHTML('beforeend', V.renderHead(config));
     var main = document.querySelector('[data-main]');
     var barra = document.querySelector('[data-barra]');
+    var testata = document.querySelector('[data-testata]');
     if (main) main.innerHTML = V.renderMain(config);
     if (barra) barra.innerHTML = V.renderBarra(config);
+    if (testata) testata.innerHTML = V.renderTestata(config);
     document.documentElement.setAttribute('data-prerender', 'true');
   }
 

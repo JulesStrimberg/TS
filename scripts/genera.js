@@ -24,7 +24,7 @@ const TEMPLATE = path.join(ROOT, 'template');
    esito, dates de relance…) est interne et ne doit jamais partir en ligne. */
 const CAMPI_PUBBLICI = [
   'id', 'nome', 'categoria', 'slogan', 'indirizzo', 'telefono', 'whatsapp', 'email',
-  'orari', 'servizi', 'recensione', 'rating', 'num_recensioni',
+  'orari', 'servizi', 'recensione', 'recensioni', 'rating', 'num_recensioni',
   'colore_primario', 'colore_accento', 'maps_place_id', 'dominio'
 ];
 
@@ -120,7 +120,9 @@ function avvisi(cliente) {
   if (!Vetrina.ok(cliente.whatsapp)) lista.push('whatsapp mancante (bottone nascosto)');
   if (!Vetrina.haOrari(cliente)) lista.push('orari assenti o solo « chiuso » (sezione nascosta)');
   else if (Vetrina.giorniAttivi(cliente).length < 7) lista.push('orari parziali (' + Vetrina.giorniAttivi(cliente).length + '/7 giorni)');
-  if (!Vetrina.ok(cliente.recensione && cliente.recensione.testo)) lista.push('recensione vuota (sezione nascosta)');
+  var avis = Vetrina.elencoRecensioni(cliente).length;
+  if (!avis) lista.push('nessuna recensione (sezione nascosta) — incollane 2-3 da Google');
+  else if (avis < 2) lista.push('una sola recensione (meglio 2-3)');
   if (!Vetrina.ok(cliente.maps_place_id)) lista.push('maps_place_id mancante');
   return lista;
 }
@@ -136,6 +138,7 @@ function generaSito(cliente, opz, sorgenti) {
   const html = sorgenti.index
     .replace('data-prerender="false"', 'data-prerender="true"')
     .replace('<!--VETRINA:HEAD-->', Vetrina.renderHead(config))
+    .replace('<!--VETRINA:TESTATA-->', Vetrina.renderTestata(config))
     .replace('<!--VETRINA:MAIN-->', Vetrina.renderMain(config))
     .replace('<!--VETRINA:BARRA-->', Vetrina.renderBarra(config));
 
@@ -158,14 +161,23 @@ function generaSito(cliente, opz, sorgenti) {
 /* Index interne : sert à relire les 9 sites d'affilée sur le téléphone.
    Il reste à la racine de /siti et n'est jamais déployé (on déploie /siti/<id>). */
 function generaIndice(risultati, opz) {
-  const righe = risultati.map((r) => `
+  const righe = risultati.map((r) => {
+    const p = r.cliente.colore_primario || '#1f2933';
+    const a = r.cliente.colore_accento || '#c9a227';
+    return `
     <li>
       <a href="./${Vetrina.esc(r.cliente.id)}/index.html">
-        <strong>${Vetrina.esc(r.cliente.nome)}</strong>
-        <span>${Vetrina.esc(r.cliente.categoria || '')}</span>
+        <span class="palette" title="${Vetrina.esc(p)} / ${Vetrina.esc(a)}">
+          <i style="background:${Vetrina.esc(p)}"></i><i style="background:${Vetrina.esc(a)}"></i>
+        </span>
+        <span class="testo">
+          <strong>${Vetrina.esc(r.cliente.nome)}</strong>
+          <span>${Vetrina.esc(r.cliente.categoria || '')} · ${Vetrina.esc(p)} / ${Vetrina.esc(a)}</span>
+        </span>
       </a>
       ${r.avvisi.length ? '<p class="avvisi">⚠ ' + r.avvisi.map(Vetrina.esc).join('<br>⚠ ') + '</p>' : '<p class="ok">Scheda completa</p>'}
-    </li>`).join('');
+    </li>`;
+  }).join('');
 
   const html = `<!doctype html>
 <html lang="it">
@@ -180,9 +192,12 @@ function generaIndice(risultati, opz) {
   p.sub{color:#5b6472;margin:0 0 22px}
   ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
   li{background:#fff;border:1px solid #e2e5ea;border-radius:14px;padding:16px}
-  li a{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:inherit;min-height:44px}
+  li a{display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;min-height:44px}
+  li a .testo{display:flex;flex-direction:column;gap:2px}
   li a strong{font-size:1.05rem}
-  li a span{color:#5b6472;font-size:.9rem}
+  li a .testo span{color:#5b6472;font-size:.9rem}
+  .palette{display:flex;flex:none;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.1)}
+  .palette i{display:block;width:22px;height:44px}
   .avvisi{margin:10px 0 0;font-size:.85rem;color:#a15c00}
   .ok{margin:10px 0 0;font-size:.85rem;color:#1c7c40}
 </style>

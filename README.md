@@ -54,14 +54,47 @@ Sections, dans l'ordre :
 | Hero | `nome`, `slogan`, note Google (`rating` + `num_recensioni`), badge « Aperto ora / Chiuso » calculé depuis `orari` | la note disparaît si `rating` est `null` ; le badge disparaît si aucun horaire n'est connu |
 | Servizi | une carte par service | section masquée si `servizi` est vide |
 | Orari | tableau, jour courant surligné | **les jours vides ne sont pas affichés** ; si aucun jour ne porte de vraie plage horaire (fiche vide, ou seulement « Chiuso »), toute la section disparaît |
-| Recensione | citation + auteur | section masquée si `recensione.testo` est vide |
+| Recensioni | 2-3 avis Google, chacun sur un **post-it** (papier teinté par la couleur d'accent, adhésif, coin corné, léger angle) | section masquée si `recensioni` est vide |
 | Mappa | iframe Google chargée à l'approche de l'écran | lien « indications » toujours présent |
 | Footer | nom, **adresse**, téléphone, e-mail | chaque ligne absente est simplement omise |
 | Barre fixe | **Chiama** + **WhatsApp** | WhatsApp masqué si `whatsapp` est vide ; sans téléphone ni WhatsApp, la barre bascule sur « Come arrivare » plutôt que de rester vide |
 
-Les couleurs `colore_primario` / `colore_accento` alimentent deux variables CSS.
 Les champs internes (`note_prospezione`, `stato`, `esito`, dates…) ne sont
 **jamais** copiés dans le site publié.
+
+### Avis
+
+Les avis vivent dans `recensioni`, un tableau de 2 à 3 avis choisis :
+
+```json
+"recensioni": [
+  { "testo": "…texte italien copié tel quel depuis Google Maps…",
+    "autore": "Elisa R.", "data": "febbraio 2026", "stelle": 5 }
+]
+```
+
+`data` et `stelle` sont facultatifs. Chaque avis devient un post-it, et le
+corps de texte rétrécit d'un cran au-delà de 170 puis de 320 caractères pour
+que toutes les fiches gardent la même allure. Les avis partent aussi dans le
+JSON-LD (`review`). Le champ `recensione` au singulier reste accepté.
+
+### Couleurs
+
+`colore_primario` (aplats : hero, en-tête, pied de page) et `colore_accento`
+(boutons, soulignés, étoiles, teinte du papier des post-it) sont censées venir
+de la **devanture ou de l'enseigne** du commerce. Comme on ne peut rien
+présumer de leur clarté, tout ce qui doit rester lisible est calculé à la
+génération plutôt que fixé :
+
+- `--su-primario` / `--su-accento` : texte noir ou blanc, selon le meilleur
+  contraste sur l'aplat ;
+- `--accento-chiaro` : l'accent éclairci juste ce qu'il faut pour atteindre un
+  contraste de 3,5:1 sur le fond du hero (utilisé pour les étoiles et le
+  sur-titre).
+
+Une palette de devanture peut donc être remplacée sans rien casser : deux
+valeurs dans `data/clienti.json`, `npm run genera`, c'est tout. La page
+`siti/index.html` affiche les pastilles des 9 palettes pour les comparer.
 
 ### Mobile-first strict
 
@@ -75,8 +108,22 @@ l'amélioration progressive :
 - hauteur de la barre fixe mesurée au chargement et re-mesurée si le texte
   grossit, pour qu'elle ne recouvre jamais la fin du contenu ;
 - carte Google chargée seulement quand elle entre dans l'écran (données mobiles) ;
-- vérifié sans débordement horizontal de 320 px à 900 px, y compris avec la
+- vérifié sans débordement horizontal de 320 px à 1920 px, y compris avec la
   police système agrandie à 22 px.
+
+### Et sur ordinateur
+
+Au-delà de 900 px le site change de mise en page plutôt que de s'étirer :
+
+- la barre fixe du bas disparaît au profit d'une **en-tête collante** (nom,
+  menu des sections réellement présentes, bouton d'appel) ;
+- hero centré, typographie plus haute, respirations doublées ;
+- services sur trois colonnes, post-it en grille (redressés au survol) ;
+- **horaires et carte côte à côte** — mais seulement si les deux existent :
+  une section seule reprend toute la largeur avec une colonne de lecture
+  limitée, pour qu'une fiche incomplète ne laisse jamais une demi-page vide ;
+- gouttières alignées au pixel entre l'en-tête, les sections et le pied de
+  page, à toutes les largeurs (vérifié à 1024, 1280, 1440 et 1920 px).
 
 Le HTML est **pré-rendu** par le générateur : la page est complète sans
 JavaScript (indexation Google, JSON-LD `LocalBusiness` avec horaires et note).
@@ -115,8 +162,9 @@ montre en rendez-vous.
 
 ## Ajouter ou mettre à jour un client
 
-1. modifier la fiche dans `data/clienti.json` (le champ `recensione` se remplit
-   en copiant le texte italien d'origine depuis Google Maps, il ne s'invente pas) ;
+1. modifier la fiche dans `data/clienti.json` (le tableau `recensioni` se
+   remplit en copiant le texte italien d'origine depuis Google Maps, il ne
+   s'invente pas) ;
 2. `npm run genera` ;
 3. `npm run serve` et relecture sur un vrai téléphone ;
 4. `npm run deploy`.

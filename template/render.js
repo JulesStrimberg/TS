@@ -22,6 +22,9 @@
     ['dom', 'Domenica', 'Su']
   ];
 
+  /* inclinaisons des post-it : fixes, pour que le rendu soit reproductible */
+  var INCLINAZIONI = ['-1.4deg', '1.1deg', '-0.7deg', '1.5deg', '-1.1deg', '0.8deg'];
+
   /* ---------- utilitaires ---------- */
 
   var ENTITES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -50,6 +53,63 @@
   function hhmm(min) {
     var h = Math.floor((min % 1440) / 60), m = (min % 60);
     return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+
+  /* ---------- couleurs ----------
+     Les couleurs viennent des devantures et des enseignes : on ne peut donc
+     rien présumer de leur clarté. Tout ce qui doit rester lisible est calculé
+     ici (texte sur aplat, accent éclairci sur fond sombre) plutôt que fixé. */
+
+  function rgb(hex) {
+    var h = String(hex || '').trim().replace('#', '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    if (!/^[0-9a-f]{6}$/i.test(h)) return null;
+    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+  }
+
+  function esa(c) {
+    return '#' + c.map(function (v) {
+      var s = Math.round(Math.max(0, Math.min(255, v))).toString(16);
+      return s.length === 1 ? '0' + s : s;
+    }).join('');
+  }
+
+  function luminanza(c) {
+    var l = c.map(function (v) {
+      var s = v / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * l[0] + 0.7152 * l[1] + 0.0722 * l[2];
+  }
+
+  function contrasto(a, b) {
+    var la = luminanza(a), lb = luminanza(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+
+  /* Noir ou blanc, selon ce qui se lit le mieux sur `sfondo`. */
+  function testoSu(sfondo) {
+    var c = rgb(sfondo);
+    if (!c) return '#ffffff';
+    return contrasto(c, [255, 255, 255]) >= contrasto(c, [20, 22, 26]) ? '#ffffff' : '#14161a';
+  }
+
+  /* Éclaircit (ou assombrit) `colore` jusqu'à atteindre le contraste voulu sur `sfondo`. */
+  function leggibile(colore, sfondo, obiettivo) {
+    var c = rgb(colore), s = rgb(sfondo);
+    if (!c || !s) return colore;
+    var verso = luminanza(s) < 0.35 ? [255, 255, 255] : [15, 17, 20];
+    var risultato = c;
+    for (var passo = 0; passo <= 10; passo++) {
+      var q = passo / 10;
+      risultato = [
+        c[0] + (verso[0] - c[0]) * q,
+        c[1] + (verso[1] - c[1]) * q,
+        c[2] + (verso[2] - c[2]) * q
+      ];
+      if (contrasto(risultato, s) >= obiettivo) break;
+    }
+    return esa(risultato);
   }
 
   /* Découpe "07:30 - 13:00 / 15:00 - 19:30" en [{apre,chiude}] (minutes depuis minuit).
@@ -120,6 +180,19 @@
     return { aperto: false, testo: 'Chiuso' };
   }
 
+  /* ---------- avis ----------
+     `recensioni` : tableau de 2-3 avis choisis (complets et précis).
+     `recensione` (singulier) reste accepté pour compatibilité. */
+  function elencoRecensioni(config) {
+    var brut = [];
+    if (Array.isArray(config.recensioni)) brut = config.recensioni;
+    else if (config.recensioni) brut = [config.recensioni];
+    if (!brut.length && config.recensione) brut = [config.recensione];
+    return brut
+      .filter(function (r) { return r && ok(r.testo); })
+      .slice(0, 6);
+  }
+
   /* ---------- liens externes ---------- */
 
   function mapsLink(config) {
@@ -151,12 +224,31 @@
     return 'Buongiorno ' + (config.nome || '') + ', vorrei un appuntamento.';
   }
 
+  /* Quelles sections existent : sert aussi au menu de la barre de bureau. */
+  function sezioni(config) {
+    return {
+      servizi: !!(config.servizi || []).filter(function (s) {
+        return ok(typeof s === 'string' ? s : s && s.nome);
+      }).length,
+      recensioni: elencoRecensioni(config).length > 0,
+      orari: haOrari(config),
+      dove: ok(config.indirizzo) || ok(config.maps_place_id)
+    };
+  }
+
   /* ---------- blocs ---------- */
 
   function renderTema(config) {
     var p = config.colore_primario || '#1f2933';
     var a = config.colore_accento || '#c9a227';
-    return '<style>:root{--primario:' + esc(p) + ';--accento:' + esc(a) + ';}</style>';
+    return '<style>:root{' +
+      '--primario:' + esc(p) + ';' +
+      '--accento:' + esc(a) + ';' +
+      /* accent éclairci pour rester lisible sur l'aplat sombre du hero */
+      '--accento-chiaro:' + esc(leggibile(a, p, 3.5)) + ';' +
+      '--su-accento:' + esc(testoSu(a)) + ';' +
+      '--su-primario:' + esc(testoSu(p)) + ';' +
+      '}</style>';
   }
 
   function renderRating(config) {
@@ -185,15 +277,19 @@
       azioni.push('<a class="btn btn--pieno" href="' + esc(itinerarioLink(config)) +
         '" target="_blank" rel="noopener">Come arrivare</a>');
     }
-    azioni.push('<a class="btn btn--vuoto" href="#servizi">I servizi</a>');
+    var s = sezioni(config);
+    azioni.push('<a class="btn btn--vuoto" href="' + (s.servizi ? '#servizi' : '#dove') + '">' +
+      (s.servizi ? 'I servizi' : 'Dove siamo') + '</a>');
 
     return '<header class="hero">' +
+      '<div class="hero__interno">' +
       (sotto ? '<p class="hero__occhiello">' + sotto + '</p>' : '') +
       '<h1 class="hero__titolo">' + esc(config.nome) + '</h1>' +
       (ok(config.slogan) ? '<p class="hero__slogan">' + esc(config.slogan) + '</p>' : '') +
       renderRating(config) +
       '<p class="stato" data-stato hidden></p>' +
       '<div class="hero__azioni">' + azioni.join('') + '</div>' +
+      '</div>' +
       '</header>';
   }
 
@@ -211,12 +307,46 @@
         '</li>';
     }).join('');
     return '<section class="sezione" id="servizi">' +
+      '<div class="sezione__interno">' +
       '<h2 class="sezione__titolo">I nostri servizi</h2>' +
       '<ul class="carte">' + carte + '</ul>' +
-      '</section>';
+      '</div></section>';
   }
 
-  function renderOrari(config) {
+  /* Un avis = un post-it. Le corps de texte rétrécit si l'avis est long,
+     comme sur un vrai bloc de papier : la fiche garde la même allure. */
+  function renderRecensioni(config) {
+    var lista = elencoRecensioni(config);
+    if (!lista.length) return '';
+
+    var postit = lista.map(function (r, i) {
+      var testo = String(r.testo).trim();
+      var taglia = testo.length > 320 ? 'corto' : (testo.length > 170 ? 'medio' : 'grande');
+      var stelle = ok(r.stelle) ? Number(r.stelle) : (ok(config.rating) ? 5 : 0);
+      var meta = [];
+      if (ok(r.data)) meta.push(esc(r.data));
+      meta.push('Google');
+      return '<li class="postit postit--' + taglia + '" style="--rot:' + INCLINAZIONI[i % INCLINAZIONI.length] + '">' +
+        (stelle ? '<p class="postit__stelle" role="img" aria-label="' + stelle + ' stelle su 5">' +
+          new Array(Math.round(stelle) + 1).join('★') + '</p>' : '') +
+        '<blockquote class="postit__testo">' + esc(testo) + '</blockquote>' +
+        '<p class="postit__firma">' + (ok(r.autore) ? esc(r.autore) : 'Cliente') + '</p>' +
+        '<p class="postit__fonte">' + meta.join(' · ') + '</p>' +
+        '</li>';
+    }).join('');
+
+    return '<section class="sezione sezione--recensioni" id="recensioni">' +
+      '<div class="sezione__interno">' +
+      '<h2 class="sezione__titolo">Dicono di noi</h2>' +
+      '<ul class="postit-lista">' + postit + '</ul>' +
+      (ok(config.maps_place_id) || ok(config.indirizzo)
+        ? '<p class="nota"><a href="' + esc(mapsLink(config)) + '" target="_blank" rel="noopener">' +
+          'Leggi tutte le recensioni su Google</a></p>'
+        : '') +
+      '</div></section>';
+  }
+
+  function renderOrari(config, sola) {
     if (!haOrari(config)) return ''; // aucun horaire exploitable : la section disparaît
     var giorni = giorniAttivi(config);
     var righe = giorni.map(function (g) {
@@ -229,30 +359,20 @@
     var parziale = giorni.length < 7
       ? '<p class="nota">Per gli altri giorni chiamaci: ti rispondiamo volentieri.</p>'
       : '';
-    return '<section class="sezione" id="orari">' +
+    return '<section class="sezione' + (sola ? ' sezione--sola' : '') + '" id="orari">' +
+      '<div class="sezione__interno">' +
       '<h2 class="sezione__titolo">Orari di apertura</h2>' +
       '<table class="orari"><tbody>' + righe + '</tbody></table>' +
       parziale +
-      '</section>';
+      '</div></section>';
   }
 
-  function renderRecensione(config) {
-    var r = config.recensione || {};
-    if (!ok(r.testo)) return ''; // pas d'avis : rien plutôt que du vide
-    return '<section class="sezione sezione--citazione" id="recensioni">' +
-      '<h2 class="sezione__titolo">Dicono di noi</h2>' +
-      '<figure class="citazione">' +
-      '<blockquote>' + esc(r.testo) + '</blockquote>' +
-      '<figcaption>' + (ok(r.autore) ? esc(r.autore) + ' · ' : '') + 'recensione Google</figcaption>' +
-      '</figure>' +
-      '</section>';
-  }
-
-  function renderMappa(config) {
+  function renderMappa(config, sola) {
     if (!ok(config.indirizzo) && !ok(config.maps_place_id)) return '';
     var src = mappaSrc(config);
     var titolo = 'Mappa · ' + (config.nome || '');
-    return '<section class="sezione" id="dove">' +
+    return '<section class="sezione' + (sola ? ' sezione--sola' : '') + '" id="dove">' +
+      '<div class="sezione__interno">' +
       '<h2 class="sezione__titolo">Dove siamo</h2>' +
       (ok(config.indirizzo) ? '<p class="indirizzo">' + esc(config.indirizzo) + '</p>' : '') +
       '<div class="mappa" data-mappa data-src="' + esc(src) + '">' +
@@ -262,7 +382,7 @@
       '</div>' +
       '<a class="btn btn--vuoto btn--largo" href="' + esc(itinerarioLink(config)) +
       '" target="_blank" rel="noopener">Apri le indicazioni stradali</a>' +
-      '</section>';
+      '</div></section>';
   }
 
   function renderFooter(config) {
@@ -279,15 +399,17 @@
       righe.push('<a class="footer__link" href="mailto:' + esc(config.email) + '">' + esc(config.email) + '</a>');
     }
     return '<footer class="footer">' +
+      '<div class="footer__interno">' +
       '<p class="footer__nome">' + esc(config.nome) + '</p>' +
       '<address class="footer__contatti">' + righe.join('') + '</address>' +
       '<p class="footer__legale">© <span data-anno>' + new Date().getFullYear() + '</span> ' +
       esc(config.nome) + '</p>' +
-      '</footer>';
+      '</div></footer>';
   }
 
-  /* Barre fixe en bas : Chiama + WhatsApp. Chaque bouton disparaît si le champ est vide ;
-     si aucun contact n'existe, on garde un bouton utile (itinéraire) plutôt qu'une barre vide. */
+  /* Barre fixe en bas (mobile) : Chiama + WhatsApp. Chaque bouton disparaît si le
+     champ est vide ; sans aucun contact, on garde un bouton utile plutôt qu'une
+     barre vide. */
   function renderBarra(config) {
     var bottoni = [];
     if (ok(config.telefono)) {
@@ -304,6 +426,37 @@
         '" target="_blank" rel="noopener">' + iconaPin() + '<span>Come arrivare</span></a>');
     }
     return bottoni.join('');
+  }
+
+  /* En-tête collant, affiché à partir du bureau : sur grand écran une barre
+     fixe en bas paraît déplacée, alors que le même contenu en haut fait
+     « vrai site ». */
+  function renderTestata(config) {
+    var s = sezioni(config);
+    var voci = [];
+    if (s.servizi) voci.push('<a href="#servizi">Servizi</a>');
+    if (s.recensioni) voci.push('<a href="#recensioni">Recensioni</a>');
+    if (s.orari) voci.push('<a href="#orari">Orari</a>');
+    if (s.dove) voci.push('<a href="#dove">Dove siamo</a>');
+
+    var cta = '';
+    if (ok(config.telefono)) {
+      cta = '<a class="testata__cta" href="' + esc(telHref(config.telefono)) + '">' +
+        iconaTel() + '<span>' + esc(config.telefono) + '</span></a>';
+    } else if (ok(config.whatsapp)) {
+      cta = '<a class="testata__cta testata__cta--wa" href="' +
+        esc(waHref(config.whatsapp, messaggioWa(config))) + '" target="_blank" rel="noopener">' +
+        iconaWa() + '<span>WhatsApp</span></a>';
+    } else {
+      cta = '<a class="testata__cta" href="' + esc(itinerarioLink(config)) +
+        '" target="_blank" rel="noopener">' + iconaPin() + '<span>Come arrivare</span></a>';
+    }
+
+    return '<div class="testata__interno">' +
+      '<a class="testata__nome" href="#contenuto">' + esc(config.nome) + '</a>' +
+      (voci.length ? '<nav class="testata__nav">' + voci.join('') + '</nav>' : '') +
+      cta +
+      '</div>';
   }
 
   function iconaTel() {
@@ -359,6 +512,20 @@
         reviewCount: ok(config.num_recensioni) ? config.num_recensioni : undefined
       };
     }
+    var recensioni = elencoRecensioni(config);
+    if (recensioni.length) {
+      dati.review = recensioni.map(function (r) {
+        return {
+          '@type': 'Review',
+          reviewBody: r.testo,
+          author: { '@type': 'Person', name: ok(r.autore) ? r.autore : 'Cliente Google' },
+          datePublished: ok(r.data_iso) ? r.data_iso : undefined,
+          reviewRating: ok(r.stelle)
+            ? { '@type': 'Rating', ratingValue: r.stelle, bestRating: 5 }
+            : undefined
+        };
+      });
+    }
     var spec = giorniAttivi(config).map(function (g) {
       var fasce = intervalli(g.valore);
       if (!fasce || !fasce.length) return null;
@@ -393,12 +560,19 @@
   /* ---------- page complète ---------- */
 
   function renderMain(config) {
+    /* Horaires et carte se font face sur grand écran, mais seulement si les
+       deux existent : une demi-page vide serait pire qu'une pleine largeur. */
+    var insieme = haOrari(config) && (ok(config.indirizzo) || ok(config.maps_place_id));
+    var orari = renderOrari(config, !insieme);
+    var mappa = renderMappa(config, !insieme);
+    var doppia = insieme
+      ? '<div class="doppia">' + orari + mappa + '</div>'
+      : (orari + mappa);
     return [
       renderHero(config),
       renderServizi(config),
-      renderOrari(config),
-      renderRecensione(config),
-      renderMappa(config),
+      renderRecensioni(config),
+      doppia,
       renderFooter(config)
     ].filter(Boolean).join('\n');
   }
@@ -407,10 +581,16 @@
     GIORNI: GIORNI,
     esc: esc,
     ok: ok,
+    rgb: rgb,
+    contrasto: contrasto,
+    testoSu: testoSu,
+    leggibile: leggibile,
     intervalli: intervalli,
     giorniAttivi: giorniAttivi,
     haOrari: haOrari,
     statoApertura: statoApertura,
+    elencoRecensioni: elencoRecensioni,
+    sezioni: sezioni,
     mappaSrc: mappaSrc,
     mapsLink: mapsLink,
     itinerarioLink: itinerarioLink,
@@ -419,6 +599,7 @@
     renderTema: renderTema,
     renderHead: renderHead,
     renderMain: renderMain,
-    renderBarra: renderBarra
+    renderBarra: renderBarra,
+    renderTestata: renderTestata
   };
 });

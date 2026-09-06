@@ -3,10 +3,10 @@
     "zona": "Bolivar / Lorenteggio / Giambellino - Milano",
     "data_estrazione": "2026-09-07",
     "fonte": "Google Maps",
-    "nota_importante": "Il campo 'sito_web' e stato verificato: tutti questi esercizi risultano SENZA sito. Ricontrolla comunque sulla scheda Google prima di uscire: i dati cambiano. Il campo 'recensione' e VUOTO di proposito - copia il testo originale italiano direttamente da Google Maps, non inventarlo.",
-    "template_config": "Ogni oggetto qui sotto va passato al template come oggetto 'config'."
+    "nota_importante": "Il campo 'sito_web' e stato verificato: tutti questi esercizi risultano SENZA sito. Ricontrolla comunque sulla scheda Google prima di uscire: i dati cambiano. Il campo 'recensioni' e VUOTO di proposito - copia il testo originale italiano direttamente da Google Maps, non inventarlo.",
+    "template_config": "Ogni oggetto qui sotto va passato al template come oggetto 'config'.",
+    "recensioni_formato": "Da 2 a 3 recensioni per cliente, complete e precise (che dicono cosa e stato fatto). Ogni voce: {\"testo\": \"...\", \"autore\": \"Nome C.\", \"data\": \"marzo 2026\", \"stelle\": 5}. 'data' e 'stelle' sono facoltativi. Ogni recensione diventa un post-it nella sezione 'Dicono di noi'."
   },
-
   "clienti": [
     {
       "id": "studio49",
@@ -19,10 +19,21 @@
       "whatsapp": "",
       "email": "",
       "orari": {
-        "lun": "", "mar": "", "mer": "", "gio": "", "ven": "", "sab": "", "dom": ""
+        "lun": "",
+        "mar": "",
+        "mer": "",
+        "gio": "",
+        "ven": "",
+        "sab": "",
+        "dom": ""
       },
-      "servizi": ["Taglio uomo", "Barba", "Taglio bambino", "Rasatura tradizionale"],
-      "recensione": { "testo": "", "autore": "" },
+      "servizi": [
+        "Taglio uomo",
+        "Barba",
+        "Taglio bambino",
+        "Rasatura tradizionale"
+      ],
+      "recensioni": [],
       "rating": null,
       "num_recensioni": null,
       "colore_primario": "#1a1a1a",
@@ -46,10 +57,21 @@
       "whatsapp": "",
       "email": "",
       "orari": {
-        "lun": "", "mar": "", "mer": "", "gio": "", "ven": "", "sab": "", "dom": "Chiuso"
+        "lun": "",
+        "mar": "",
+        "mer": "",
+        "gio": "",
+        "ven": "",
+        "sab": "",
+        "dom": "Chiuso"
       },
-      "servizi": ["Orli e accorciature", "Modifiche su misura", "Cambio cerniere", "Riparazioni capi in pelle"],
-      "recensione": { "testo": "", "autore": "" },
+      "servizi": [
+        "Orli e accorciature",
+        "Modifiche su misura",
+        "Cambio cerniere",
+        "Riparazioni capi in pelle"
+      ],
+      "recensioni": [],
       "rating": null,
       "num_recensioni": null,
       "colore_primario": "#2c3e50",
@@ -81,8 +103,14 @@
         "sab": "09:00 - 19:00",
         "dom": "Chiuso"
       },
-      "servizi": ["Manicure e pedicure", "Trattamenti viso", "Epilazione", "Massaggi", "Trattamenti corpo"],
-      "recensione": { "testo": "", "autore": "" },
+      "servizi": [
+        "Manicure e pedicure",
+        "Trattamenti viso",
+        "Epilazione",
+        "Massaggi",
+        "Trattamenti corpo"
+      ],
+      "recensioni": [],
       "rating": 4.7,
       "num_recensioni": 116,
       "colore_primario": "#7d5a5a",
@@ -114,8 +142,14 @@
         "sab": "10:00 - 19:00",
         "dom": "Chiuso"
       },
-      "servizi": ["Toelettatura completa", "Bagno e asciugatura", "Taglio unghie", "Pulizia orecchie", "Cani con caratteri difficili"],
-      "recensione": { "testo": "", "autore": "" },
+      "servizi": [
+        "Toelettatura completa",
+        "Bagno e asciugatura",
+        "Taglio unghie",
+        "Pulizia orecchie",
+        "Cani con caratteri difficili"
+      ],
+      "recensioni": [],
       "rating": 5.0,
       "num_recensioni": 23,
       "colore_primario": "#4a6741",
@@ -147,8 +181,14 @@
         "sab": "10:30 - 18:30",
         "dom": "Chiuso"
       },
-      "servizi": ["Toelettatura su appuntamento", "Un solo cane per volta", "Taglio unghie", "Bagno e asciugatura", "Prima toelettatura cuccioli"],
-      "recensione": { "testo": "", "autore": "" },
+      "servizi": [
+        "Toelettatura su appuntamento",
+        "Un solo cane per volta",
+        "Taglio unghie",
+        "Bagno e asciugatura",
+        "Prima toelettatura cuccioli"
+      ],
+      "recensioni": [],
       "rating": 5.0,
       "num_recensioni": 37,
       "colore_primario": "#3d5a80",
@@ -180,8 +220,13 @@
         "sab": "07:30 - 13:00",
         "dom": "Chiuso"
       },
-      "servizi": ["Risuolatura", "Riparazioni difficili", "Restauro borse e pelletteria", "Lavori che altri rifiutano"],
-      "recensione": { "testo": "", "autore": "" },
+      "servizi": [
+        "Risuolatura",
+        "Riparazioni difficili",
+        "Restauro borse e pelletteria",
+        "Lavori che altri rifiutano"
+      ],
+      "recensioni": [],
       "rating": 4.9,
       "num_recensioni": 46,
       "colore_primario": "#5c4033",
@@ -205,10 +250,20 @@
       "whatsapp": "",
       "email": "",
       "orari": {
-        "lun": "", "mar": "", "mer": "", "gio": "", "ven": "", "sab": "", "dom": ""
+        "lun": "",
+        "mar": "",
+        "mer": "",
+        "gio": "",
+        "ven": "",
+        "sab": "",
+        "dom": ""
       },
-      "servizi": ["Taglio uomo", "Barba", "Taglio classico"],
-      "recensione": { "testo": "", "autore": "" },
+      "servizi": [
+        "Taglio uomo",
+        "Barba",
+        "Taglio classico"
+      ],
+      "recensioni": [],
       "rating": 4.9,
       "num_recensioni": 16,
       "colore_primario": "#22333b",
@@ -240,8 +295,14 @@
         "sab": "09:00 - 20:00",
         "dom": "09:00 - 17:00"
       },
-      "servizi": ["Ricostruzione unghie", "Nail art personalizzata", "Refill gel", "Manicure e pedicure", "Trattamenti viso"],
-      "recensione": { "testo": "", "autore": "" },
+      "servizi": [
+        "Ricostruzione unghie",
+        "Nail art personalizzata",
+        "Refill gel",
+        "Manicure e pedicure",
+        "Trattamenti viso"
+      ],
+      "recensioni": [],
       "rating": 4.3,
       "num_recensioni": 87,
       "colore_primario": "#8e4585",
@@ -273,8 +334,13 @@
         "sab": "10:00 - 18:00",
         "dom": "Chiuso"
       },
-      "servizi": ["Toelettatura etica", "Alimenti di qualita", "Accessori", "Consulenza sulla cura del pelo"],
-      "recensione": { "testo": "", "autore": "" },
+      "servizi": [
+        "Toelettatura etica",
+        "Alimenti di qualita",
+        "Accessori",
+        "Consulenza sulla cura del pelo"
+      ],
+      "recensioni": [],
       "rating": 4.3,
       "num_recensioni": 56,
       "colore_primario": "#386641",
@@ -288,7 +354,6 @@
       "esito": ""
     }
   ],
-
   "esclusi": [
     {
       "nome": "CITY ESTETICA di Mildred Hichez",
