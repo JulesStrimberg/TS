@@ -1,0 +1,8 @@
+node_modules/
+siti/
+.netlify/
+.DS_Store
+
+# Donnees de prospection : jamais dans le depot (notes commerciales,
+# fiches clients). Copier data/clienti.esempio.json pour demarrer.
+data/*.local.json

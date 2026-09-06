@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "come_usare": "Copiare questo file in data/clienti.local.json (ignorato da git) e sostituire i dati. Le note commerciali e lo stato della trattativa restano fuori dal repository.",
+    "campi_interni": "priorita, note_prospezione, stato, data_invio, data_visita, esito, sito_web NON vengono mai pubblicati: il generatore copia solo i campi della lista bianca in scripts/genera.js.",
+    "recensioni_formato": "Da 2 a 3 recensioni per cliente, complete e precise (che dicono cosa e stato fatto). Ogni voce: {\"testo\": \"...\", \"autore\": \"Nome C.\", \"data\": \"marzo 2026\", \"stelle\": 5}. 'data' e 'stelle' sono facoltativi. Il testo si copia da Google Maps, non si inventa.",
+    "partita_iva": "Obbligatoria sul sito di un'attivita commerciale italiana: e quella del commerciante, va chiesta insieme a orari e telefono."
+  },
+
+  "clienti": [
+    {
+      "id": "bottega-esempio",
+      "priorita": 1,
+      "nome": "Bottega Esempio",
+      "categoria": "esempio",
+      "slogan": "Una riga che dice cosa fate e dove",
+      "indirizzo": "Via Esempio 1, 20146 Milano",
+      "telefono": "+39 02 0000 0000",
+      "whatsapp": "+39 300 000 0000",
+      "email": "",
+      "partita_iva": "00000000000",
+      "orari": {
+        "lun": "Chiuso",
+        "mar": "09:00 - 19:00",
+        "mer": "09:00 - 19:00",
+        "gio": "09:00 - 19:00",
+        "ven": "09:00 - 19:30",
+        "sab": "09:00 - 13:00 / 15:00 - 18:00",
+        "dom": "Chiuso"
+      },
+      "servizi": ["Primo servizio", "Secondo servizio", "Terzo servizio"],
+      "recensioni": [
+        {
+          "testo": "Testo originale della recensione, copiato da Google Maps senza modifiche.",
+          "autore": "Nome C.",
+          "data": "marzo 2026",
+          "stelle": 5
+        }
+      ],
+      "rating": 4.8,
+      "num_recensioni": 42,
+      "colore_primario": "#1f2933",
+      "colore_accento": "#c9a227",
+      "maps_place_id": "",
+      "sito_web": null,
+      "note_prospezione": "Campo interno: non finisce mai nel sito pubblicato.",
+      "stato": "da_contattare",
+      "data_invio": "",
+      "data_visita": "",
+      "esito": ""
+    }
+  ]
+}
