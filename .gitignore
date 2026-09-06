@@ -1,0 +1,4 @@
+node_modules/
+siti/
+.netlify/
+.DS_Store

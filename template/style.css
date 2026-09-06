@@ -1,0 +1,404 @@
+/* =========================================================================
+   Site vitrine — feuille de style unique, mobile-first stricte.
+   Cible de référence : écran de 6 pouces (~360-400 px CSS) tenu à bout de bras.
+   Règles tenues partout : corps de texte >= 17 px, cibles tactiles >= 48 px,
+   une seule colonne, aucun survol indispensable, respect des safe-areas iOS.
+   ========================================================================= */
+
+:root {
+  /* --primario / --accento sont injectés par le <style> de la page (couleurs du client) */
+  --primario: #1f2933;
+  --accento: #c9a227;
+
+  --testo: #16181d;
+  --testo-tenue: #5b6472;
+  --fondo: #ffffff;
+  --superficie: #f5f6f8;
+  --bordo: #e2e5ea;
+  --wa: #25d366;
+
+  --raggio: 14px;
+  --spazio: 20px;
+  --barra-h: 76px;   /* recalculée au chargement par app.js (mesure réelle) */
+  --max: 640px;
+
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  /* 17 px minimum : en dessous, un écran de 6 pouces à bout de bras devient illisible */
+  font-size: clamp(17px, 1rem + 0.25vw, 19px);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--testo);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.55;
+  /* la barre fixe ne doit jamais recouvrir la fin du contenu */
+  padding-bottom: calc(var(--barra-h) + env(safe-area-inset-bottom));
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3 { line-height: 1.2; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+img, svg, iframe { max-width: 100%; }
+
+a { color: inherit; }
+
+.salta {
+  position: absolute; left: -9999px;
+  background: var(--primario); color: #fff; padding: 12px 16px; z-index: 100;
+}
+.salta:focus { left: 8px; top: 8px; border-radius: 8px; }
+
+:focus-visible { outline: 3px solid var(--accento); outline-offset: 2px; }
+
+/* ---------- hero ---------- */
+
+.hero {
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, .16), transparent 60%),
+    var(--primario);
+  color: #fff;
+  padding: calc(env(safe-area-inset-top) + 44px) var(--spazio) 36px;
+  text-align: left;
+}
+
+.hero__occhiello {
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  font-size: .86rem;
+  font-weight: 700;
+  color: var(--accento);
+  margin-bottom: 10px;
+}
+
+.hero__titolo {
+  font-size: clamp(2.05rem, 8.5vw, 2.9rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+.hero__slogan {
+  margin-top: 12px;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, .88);
+  max-width: 28ch;
+}
+
+.rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, .85);
+}
+.rating__voto { font-weight: 800; color: #fff; font-size: 1.05rem; }
+.rating__conteggio { color: rgba(255, 255, 255, .72); }
+
+.stelle {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, .3);
+}
+.stelle::before { content: "\2605\2605\2605\2605\2605"; }
+.stelle::after {
+  content: "\2605\2605\2605\2605\2605";
+  position: absolute;
+  inset: 0;
+  width: var(--p, 0%);
+  overflow: hidden;
+  color: var(--accento);
+}
+
+.stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+  font-size: .97rem;
+  font-weight: 600;
+}
+.stato::before {
+  content: "";
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #9aa3ae;
+}
+.stato[data-aperto="true"]::before { background: #37d67a; }
+.stato[data-aperto="false"]::before { background: #ff8a5b; }
+
+.hero__azioni {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+/* ---------- boutons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 14px 22px;
+  border-radius: var(--raggio);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: transform .12s ease, opacity .12s ease;
+}
+.btn:active { transform: scale(.98); }
+.btn--pieno { background: var(--accento); color: #14161a; }
+.btn--vuoto { border-color: currentColor; color: inherit; }
+.btn--largo { width: 100%; margin-top: 16px; }
+
+/* ---------- sections ---------- */
+
+.sezione {
+  padding: 40px var(--spazio);
+  max-width: var(--max);
+  margin: 0 auto;
+}
+.sezione + .sezione { border-top: 1px solid var(--bordo); }
+
+.sezione__titolo {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  margin-bottom: 20px;
+}
+.sezione__titolo::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 4px;
+  margin-top: 10px;
+  border-radius: 2px;
+  background: var(--accento);
+}
+
+.nota {
+  margin-top: 14px;
+  font-size: .95rem;
+  color: var(--testo-tenue);
+}
+
+/* ---------- services ---------- */
+
+.carte {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.carta {
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  padding: 18px 18px 18px 52px;
+  position: relative;
+}
+.carta::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 21px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accento);
+}
+.carta::after {
+  content: "";
+  position: absolute;
+  left: 23.5px;
+  top: 27px;
+  width: 9px;
+  height: 5px;
+  border-left: 2.5px solid #fff;
+  border-bottom: 2.5px solid #fff;
+  transform: rotate(-45deg);
+}
+.carta__titolo { font-size: 1.05rem; font-weight: 700; }
+.carta__testo { margin-top: 6px; font-size: .97rem; color: var(--testo-tenue); }
+
+/* ---------- horaires ---------- */
+
+.orari {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+.orari th, .orari td {
+  padding: 13px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--bordo);
+  vertical-align: top;
+}
+.orari th { font-weight: 600; width: 42%; }
+.orari td { text-align: right; font-variant-numeric: tabular-nums; }
+.orari td.chiuso { color: var(--testo-tenue); }
+.orari tr:last-child th, .orari tr:last-child td { border-bottom: 0; }
+
+.orari tr[data-oggi] th, .orari tr[data-oggi] td {
+  background: color-mix(in srgb, var(--accento) 16%, transparent);
+  font-weight: 800;
+}
+.orari tr[data-oggi] th::after {
+  content: "oggi";
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--primario);
+  color: #fff;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  vertical-align: 2px;
+}
+
+/* ---------- avis ---------- */
+
+.sezione--citazione { background: var(--superficie); max-width: none; }
+.sezione--citazione > * { max-width: var(--max); margin-left: auto; margin-right: auto; }
+
+.citazione { margin: 0; }
+.citazione blockquote {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  font-style: italic;
+  border-left: 4px solid var(--accento);
+  padding-left: 16px;
+}
+.citazione figcaption {
+  margin-top: 14px;
+  padding-left: 20px;
+  font-size: .97rem;
+  color: var(--testo-tenue);
+  font-weight: 600;
+}
+
+/* ---------- carte Google ---------- */
+
+.indirizzo { font-size: 1.05rem; margin-bottom: 16px; }
+
+.mappa {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--raggio);
+  overflow: hidden;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+}
+.mappa iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.mappa__attesa {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--testo-tenue);
+  font-size: .97rem;
+}
+
+/* ---------- pied de page ---------- */
+
+.footer {
+  background: var(--primario);
+  color: rgba(255, 255, 255, .85);
+  padding: 34px var(--spazio) 40px;
+  text-align: center;
+}
+.footer__nome { font-weight: 800; color: #fff; font-size: 1.1rem; margin-bottom: 10px; }
+.footer__contatti {
+  font-style: normal;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;   /* pas de séparateurs qui traînent en fin de ligne */
+  align-items: center;
+  gap: 4px;
+}
+.footer__link { color: #fff; text-decoration: underline; text-underline-offset: 3px; padding: 6px 2px; }
+.footer__legale { margin-top: 18px; font-size: .92rem; opacity: .75; }
+
+/* ---------- barre fixe ---------- */
+
+.barra {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, .96);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--bordo);
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, .08);
+}
+.barra:empty { display: none; }
+
+.barra__btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;              /* le libellé peut rétrécir plutôt que déborder */
+  min-height: 52px;          /* cible tactile confortable au pouce */
+  padding: 10px 10px;
+  border-radius: 12px;
+  font-size: clamp(.95rem, 4vw, 1.05rem);
+  font-weight: 700;
+  text-decoration: none;
+  color: #fff;
+}
+.barra__btn:active { transform: scale(.985); }
+.barra__btn svg { width: 22px; height: 22px; flex: none; }
+.barra__btn--chiama { background: var(--primario); }
+.barra__btn--wa { background: var(--wa); color: #08301a; }
+
+/* ---------- écrans plus larges (progressive enhancement seulement) ---------- */
+
+@media (min-width: 560px) {
+  .footer__contatti { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 4px 20px; }
+  .carte { grid-template-columns: 1fr 1fr; }
+  .hero__azioni { flex-direction: row; }
+  .btn { flex: 1; }
+}
+
+@media (min-width: 900px) {
+  :root { --spazio: 32px; }
+  .hero { padding-top: 72px; padding-bottom: 64px; text-align: center; }
+  .hero__slogan, .hero__azioni, .rating { margin-left: auto; margin-right: auto; }
+  .rating, .hero__azioni { justify-content: center; }
+  .hero__azioni { max-width: 520px; }
+  .carte { grid-template-columns: repeat(3, 1fr); }
+  .btn--largo { max-width: 360px; margin-inline: auto; display: flex; }
+  .barra { left: 50%; right: auto; transform: translateX(-50%); width: min(560px, 100%); border-radius: 16px 16px 0 0; border: 1px solid var(--bordo); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .btn, .barra__btn { transition: none; }
+}
