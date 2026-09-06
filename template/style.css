@@ -1,0 +1,528 @@
+/* =========================================================================
+   Site vitrine — feuille de style unique.
+   Mobile-first stricte : la cible de référence est un écran de 6 pouces
+   (~360 px CSS) tenu à bout de bras. Corps de texte >= 17 px, cibles
+   tactiles >= 52 px, une seule colonne, aucun survol indispensable,
+   safe-areas iOS respectées.
+   Au-delà de 900 px, le site passe en mise en page de bureau : en-tête
+   collante, grilles à plusieurs colonnes, contenu centré et aéré.
+   ========================================================================= */
+
+:root {
+  /* --primario, --accento, --accento-chiaro, --su-accento, --su-primario
+     sont injectés par le <style> de la page (couleurs de l'enseigne) */
+  --primario: #1f2933;
+  --accento: #c9a227;
+  --accento-chiaro: #e3c765;
+  --su-accento: #14161a;
+  --su-primario: #ffffff;
+
+  --testo: #16181d;
+  --testo-tenue: #5b6472;
+  --fondo: #ffffff;
+  --superficie: #f5f6f8;
+  --bordo: #e2e5ea;
+  --wa: #25d366;
+  --carta: #fffbea;          /* papier des post-it */
+
+  --raggio: 14px;
+  --spazio: 20px;
+  --barra-h: 76px;           /* recalculée au chargement par app.js */
+  --max: 640px;              /* colonne de lecture (mobile) */
+  --max-largo: 1140px;       /* largeur des grilles (bureau) */
+
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* un élément masqué le reste, même si sa classe impose un display */
+[hidden] { display: none !important; }
+
+html {
+  /* 17 px minimum : en dessous, un écran de 6 pouces à bout de bras devient illisible */
+  font-size: clamp(17px, 1rem + 0.25vw, 19px);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;   /* l'en-tête collante ne doit pas masquer l'ancre */
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--testo);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.55;
+  padding-bottom: calc(var(--barra-h) + env(safe-area-inset-bottom));
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3 { line-height: 1.2; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+img, svg, iframe { max-width: 100%; }
+a { color: inherit; }
+
+.salta { position: absolute; left: -9999px; background: var(--primario); color: #fff; padding: 12px 16px; z-index: 100; }
+.salta:focus { left: 8px; top: 8px; border-radius: 8px; }
+
+:focus-visible { outline: 3px solid var(--accento); outline-offset: 2px; }
+
+/* ---------- en-tête collante (bureau uniquement) ---------- */
+
+.testata { display: none; }
+
+/* ---------- hero ---------- */
+
+.hero {
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, .16), transparent 60%),
+    var(--primario);
+  color: var(--su-primario);
+  padding: calc(env(safe-area-inset-top) + 44px) var(--spazio) 36px;
+}
+
+.hero__interno { max-width: var(--max); margin: 0 auto; }
+
+.hero__occhiello {
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  font-size: .86rem;
+  font-weight: 700;
+  color: var(--accento-chiaro);
+  margin-bottom: 10px;
+}
+
+.hero__titolo {
+  font-size: clamp(2.05rem, 8.5vw, 2.9rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+.hero__slogan {
+  margin-top: 12px;
+  font-size: 1.1rem;
+  opacity: .9;
+  max-width: 32ch;
+}
+
+.rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 1rem;
+  opacity: .92;
+}
+.rating__voto { font-weight: 800; font-size: 1.05rem; opacity: 1; }
+.rating__conteggio { opacity: .8; }
+
+.stelle {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: rgba(128, 128, 128, .45);
+}
+.stelle::before { content: "\2605\2605\2605\2605\2605"; }
+.stelle::after {
+  content: "\2605\2605\2605\2605\2605";
+  position: absolute;
+  inset: 0;
+  width: var(--p, 0%);
+  overflow: hidden;
+  color: var(--accento-chiaro);
+}
+
+.stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .22);
+  font-size: .97rem;
+  font-weight: 600;
+}
+.stato::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #9aa3ae; }
+.stato[data-aperto="true"]::before { background: #37d67a; }
+.stato[data-aperto="false"]::before { background: #ff8a5b; }
+
+.hero__azioni { display: flex; flex-direction: column; gap: 12px; margin-top: 26px; }
+
+/* ---------- boutons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 14px 22px;
+  border-radius: var(--raggio);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn:active { transform: scale(.98); }
+.btn--pieno { background: var(--accento); color: var(--su-accento); }
+.btn--vuoto { border-color: currentColor; color: inherit; }
+.btn--largo { width: 100%; margin-top: 16px; }
+
+/* ---------- sections ---------- */
+
+.sezione { padding: 40px var(--spazio); border-top: 1px solid var(--bordo); }
+.hero + .sezione, .hero + .doppia .sezione:first-child { border-top: 0; }
+.sezione__interno { max-width: var(--max); margin: 0 auto; }
+
+.sezione__titolo { font-size: 1.45rem; font-weight: 800; letter-spacing: -.01em; margin-bottom: 20px; }
+.sezione__titolo::after {
+  content: "";
+  display: block;
+  width: 44px; height: 4px;
+  margin-top: 10px;
+  border-radius: 2px;
+  background: var(--accento);
+}
+
+.nota { margin-top: 14px; font-size: .95rem; color: var(--testo-tenue); }
+.nota a { color: inherit; }
+
+/* ---------- services ---------- */
+
+.carte { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+
+.carta {
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  padding: 18px 18px 18px 52px;
+  position: relative;
+}
+.carta::before {
+  content: "";
+  position: absolute;
+  left: 18px; top: 21px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--accento);
+}
+.carta::after {
+  content: "";
+  position: absolute;
+  left: 23.5px; top: 27px;
+  width: 9px; height: 5px;
+  border-left: 2.5px solid var(--su-accento);
+  border-bottom: 2.5px solid var(--su-accento);
+  transform: rotate(-45deg);
+}
+.carta__titolo { font-size: 1.05rem; font-weight: 700; }
+.carta__testo { margin-top: 6px; font-size: .97rem; color: var(--testo-tenue); }
+
+/* ---------- avis : post-it ---------- */
+
+.sezione--recensioni { background: var(--superficie); }
+
+.postit-lista { list-style: none; margin: 0; padding: 6px 0 0; display: grid; gap: 22px; }
+
+.postit {
+  position: relative;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accento) 10%, var(--carta)), var(--carta));
+  color: #23231e;
+  padding: 26px 22px 20px;
+  border-radius: 3px;
+  transform: rotate(var(--rot, 0deg));
+  box-shadow: 0 10px 18px rgba(20, 22, 26, .13), 0 2px 4px rgba(20, 22, 26, .08);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+/* le morceau d'adhésif en haut du post-it */
+.postit::before {
+  content: "";
+  position: absolute;
+  top: -9px; left: 50%;
+  width: 84px; height: 20px;
+  transform: translateX(-50%) rotate(-1.5deg);
+  background: rgba(255, 255, 255, .55);
+  border: 1px solid rgba(20, 22, 26, .06);
+  box-shadow: 0 1px 2px rgba(20, 22, 26, .1);
+}
+/* le coin corné, en bas à droite */
+.postit::after {
+  content: "";
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 26px; height: 26px;
+  background: linear-gradient(135deg, transparent 50%, rgba(20, 22, 26, .1) 50%);
+}
+
+.postit__stelle { color: #e8a300; letter-spacing: 2px; font-size: 1rem; margin-bottom: 8px; }
+
+.postit__testo {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.45;
+  font-style: italic;
+}
+.postit--medio .postit__testo { font-size: 1.02rem; }
+.postit--corto .postit__testo { font-size: .97rem; line-height: 1.42; }
+
+.postit__firma { margin-top: 14px; font-weight: 800; font-size: 1rem; }
+.postit__fonte { font-size: .88rem; opacity: .65; }
+
+/* ---------- horaires ---------- */
+
+.orari { width: 100%; border-collapse: collapse; font-size: 1rem; }
+.orari th, .orari td { padding: 13px 12px; text-align: left; border-bottom: 1px solid var(--bordo); vertical-align: top; }
+.orari th { font-weight: 600; width: 42%; }
+.orari td { text-align: right; font-variant-numeric: tabular-nums; }
+.orari td.chiuso { color: var(--testo-tenue); }
+.orari tr:last-child th, .orari tr:last-child td { border-bottom: 0; }
+
+.orari tr[data-oggi] th, .orari tr[data-oggi] td {
+  background: color-mix(in srgb, var(--accento) 16%, transparent);
+  font-weight: 800;
+}
+.orari tr[data-oggi] th::after {
+  content: "oggi";
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--primario);
+  color: var(--su-primario);
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  vertical-align: 2px;
+}
+
+/* ---------- carte Google ---------- */
+
+.indirizzo { font-size: 1.05rem; margin-bottom: 16px; }
+
+.mappa {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--raggio);
+  overflow: hidden;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+}
+.mappa iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.mappa__attesa {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--testo-tenue); font-size: .97rem;
+}
+
+/* ---------- pied de page ---------- */
+
+.footer {
+  background: var(--primario);
+  color: var(--su-primario);
+  padding: 34px var(--spazio) 40px;
+  text-align: center;
+}
+.footer__interno { max-width: var(--max); margin: 0 auto; }
+.footer__nome { font-weight: 800; font-size: 1.1rem; margin-bottom: 10px; }
+.footer__contatti {
+  font-style: normal;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;   /* pas de séparateurs qui traînent en fin de ligne */
+  align-items: center;
+  gap: 4px;
+}
+.footer__link { text-decoration: underline; text-underline-offset: 3px; padding: 6px 2px; }
+.footer__legale { margin-top: 18px; font-size: .92rem; opacity: .75; }
+
+/* ---------- barre fixe (mobile) ---------- */
+
+.barra {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, .96);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--bordo);
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, .08);
+}
+.barra:empty { display: none; }
+
+.barra__btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  font-size: clamp(.95rem, 4vw, 1.05rem);
+  font-weight: 700;
+  text-decoration: none;
+  color: #fff;
+}
+.barra__btn:active { transform: scale(.985); }
+.barra__btn svg { width: 22px; height: 22px; flex: none; }
+.barra__btn--chiama { background: var(--primario); color: var(--su-primario); }
+.barra__btn--wa { background: var(--wa); color: #08301a; }
+
+/* =========================================================================
+   Écrans intermédiaires
+   ========================================================================= */
+
+@media (min-width: 560px) {
+  .carte { grid-template-columns: 1fr 1fr; }
+  .postit-lista { grid-template-columns: 1fr 1fr; }
+  .footer__contatti { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 4px 20px; }
+  .hero__azioni { flex-direction: row; }
+  .hero__azioni .btn { flex: 1; }
+}
+
+/* =========================================================================
+   Bureau : le site doit être aussi soigné qu'au téléphone.
+   ========================================================================= */
+
+@media (min-width: 900px) {
+  :root { --spazio: 40px; }
+
+  body { padding-bottom: 0; }
+  .barra { display: none; }          /* remplacée par l'en-tête collante */
+
+  /* --- en-tête --- */
+  .testata {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: color-mix(in srgb, var(--primario) 92%, black);
+    color: var(--su-primario);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .08);
+  }
+  .testata__interno {
+    max-width: calc(var(--max-largo) + 2 * var(--spazio));   /* aligné sur les sections */
+    margin: 0 auto;
+    padding: 12px var(--spazio);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .testata__nome {
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-decoration: none;
+    letter-spacing: -.01em;
+  }
+  .testata__nav { margin-left: auto; display: flex; gap: 22px; }
+  .testata__nav a {
+    text-decoration: none;
+    font-size: .98rem;
+    font-weight: 600;
+    opacity: .85;
+    padding: 8px 0;
+    border-bottom: 2px solid transparent;
+  }
+  .testata__nav a:hover { opacity: 1; border-bottom-color: var(--accento-chiaro); }
+  .testata__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--accento);
+    color: var(--su-accento);
+    padding: 11px 18px;
+    border-radius: 999px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .testata__cta svg { width: 19px; height: 19px; }
+  .testata__cta--wa { background: var(--wa); color: #08301a; }
+  .testata__nav + .testata__cta { margin-left: 0; }
+  .testata__nome + .testata__cta { margin-left: auto; }
+
+  /* --- hero --- */
+  .hero {
+    padding: 92px var(--spazio) 84px;
+    text-align: center;
+    background:
+      radial-gradient(90% 120% at 50% -20%, rgba(255, 255, 255, .18), transparent 65%),
+      var(--primario);
+  }
+  .hero__interno { max-width: 780px; }
+  .hero__titolo { font-size: clamp(2.9rem, 4.6vw, 3.9rem); }
+  .hero__slogan { font-size: 1.3rem; max-width: 42ch; margin-left: auto; margin-right: auto; }
+  .rating, .hero__azioni { justify-content: center; }
+  .hero__azioni { max-width: 520px; margin-left: auto; margin-right: auto; margin-top: 34px; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, .18); }
+
+  /* --- sections --- */
+  .sezione { padding: 72px var(--spazio); }
+  .sezione__interno { max-width: var(--max-largo); }
+  .sezione__titolo { font-size: 1.9rem; margin-bottom: 30px; }
+
+  .carte { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .carta { padding: 26px 24px 26px 58px; transition: transform .15s ease, box-shadow .15s ease; }
+  .carta::before { top: 28px; }
+  .carta::after { top: 34px; }
+  .carta:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(20, 22, 26, .08); }
+  .carta__titolo { font-size: 1.12rem; }
+
+  /* --- post-it : légèrement redressés au survol, comme sur un tableau --- */
+  .postit-lista { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px 26px; }
+  .postit:hover { transform: rotate(0deg) translateY(-4px); box-shadow: 0 16px 30px rgba(20, 22, 26, .18); }
+  .postit__testo { font-size: 1.12rem; }
+
+  /* --- horaires + carte côte à côte --- */
+  .doppia {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    max-width: var(--max-largo);
+    margin: 0 auto;
+    border-top: 1px solid var(--bordo);
+  }
+  .doppia .sezione { border-top: 0; padding-left: 0; padding-right: 0; }
+  .doppia .sezione:last-child:not(:first-child) { padding-left: 48px; border-left: 1px solid var(--bordo); }
+  .doppia .sezione__interno { max-width: none; }
+  .doppia .mappa { aspect-ratio: 16 / 11; }
+  /* seule sur sa ligne, la section garde une largeur de lecture :
+     une carte de 1140 px de large ferait un mur */
+  .sezione--sola .sezione__interno { max-width: 780px; }
+  .sezione--sola .mappa { aspect-ratio: 16 / 10; }
+  .btn--largo { max-width: 340px; }
+
+  /* la gouttière de la double section doit tomber pile sur celle des autres
+     sections, sinon les titres ne sont pas alignés d'une section à l'autre */
+  .doppia { padding: 0 var(--spazio); max-width: calc(var(--max-largo) + 2 * var(--spazio)); }
+  .doppia .sezione:first-child { padding-right: 48px; }
+
+  /* --- pied de page --- */
+  .footer { padding: 56px var(--spazio); }
+  .footer__interno { max-width: var(--max-largo); }
+  .footer__nome { font-size: 1.35rem; }
+  .footer__contatti { font-size: 1.05rem; gap: 6px 28px; }
+}
+
+@media (min-width: 1280px) {
+  .hero { padding: 110px var(--spazio) 100px; }
+}
+
+/* ---------- confort et impression ---------- */
+
+@media (hover: none) {
+  .btn:hover, .carta:hover, .postit:hover { transform: none; box-shadow: none; }
+  .postit:hover { box-shadow: 0 10px 18px rgba(20, 22, 26, .13); transform: rotate(var(--rot, 0deg)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .btn, .barra__btn, .carta, .postit { transition: none; }
+}

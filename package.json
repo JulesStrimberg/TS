@@ -1,0 +1,14 @@
+{
+  "name": "vetrine-locali",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Template de site vitrine une page (HTML/CSS/JS pur) + generateur et deploiement Netlify en lot pour les commerces de Bolivar / Lorenteggio / Giambellino.",
+  "scripts": {
+    "genera": "node scripts/genera.js",
+    "genera:pulito": "node scripts/genera.js --pulisci",
+    "serve": "node scripts/serve.js",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:bozza": "bash scripts/deploy.sh --bozza"
+  },
+  "engines": { "node": ">=18" }
+}
