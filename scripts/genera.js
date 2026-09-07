@@ -39,6 +39,7 @@ function leggiArgomenti(argv) {
     else if (a === '--solo') opz.solo = String(argv[++i]).split(',').map((s) => s.trim()).filter(Boolean);
     else if (a === '--maps-key') opz.mapsKey = argv[++i];
     else if (a === '--pulisci') opz.pulisci = true;
+    else if (a === '--tutti') opz.tutti = true;
     else if (a === '--aiuto' || a === '-h' || a === '--help') opz.aiuto = true;
     else throw new Error('Argomento sconosciuto: ' + a);
   }
@@ -53,6 +54,10 @@ Uso : node scripts/genera.js [opzioni]
   --solo <id,id>    genera solo questi id
   --maps-key <k>    chiave Google Maps Embed  (oppure GOOGLE_MAPS_EMBED_KEY)
   --pulisci         svuota la cartella di uscita prima di generare
+  --tutti           genera anche le schede con stato "escluso_*"
+
+Le schede il cui stato inizia con "escluso" sono saltate: restano nel file
+(con un altro argomento tornano contattabili) ma non entrano nel giro.
 `;
 
 /* ---------- utilitaires ---------- */
@@ -244,6 +249,12 @@ function main() {
     if (mancanti.length) { console.error('id sconosciuti: ' + mancanti.join(', ')); process.exit(1); }
     clienti = clienti.filter((c) => set.has(c.id));
   }
+  let saltati = [];
+  if (!opz.solo && !opz.tutti) {
+    // --solo est un choix explicite : il l'emporte sur le statut
+    saltati = clienti.filter((c) => /^escluso/i.test(String(c.stato || '')));
+    clienti = clienti.filter((c) => !/^escluso/i.test(String(c.stato || '')));
+  }
   if (!clienti.length) { console.error('Nessun cliente da generare.'); process.exit(1); }
 
   const uscita = path.join(ROOT, opz.out);
@@ -266,6 +277,11 @@ function main() {
   generaIndice(risultati, opz);
 
   console.log('\n' + risultati.length + ' siti generati in ' + opz.out + '/\n');
+  if (saltati.length) {
+    console.log('  Saltati (stato escluso, --tutti per includerli):');
+    for (const c of saltati) console.log('    ' + c.id.padEnd(22) + (c.motivo_esclusione || c.stato));
+    console.log('');
+  }
   for (const r of risultati) {
     console.log('  ' + r.cliente.id.padEnd(22) + (r.peso / 1024).toFixed(1).padStart(6) + ' Ko   ' + r.cliente.nome);
     for (const a of r.avvisi) console.log('      - ' + a);

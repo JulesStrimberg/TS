@@ -41,15 +41,22 @@ en utiliser un autre, `--dati <fichier>`.
 ## Utilisation
 
 ```bash
-npm run genera              # génère les sites dans siti/
+npm run genera              # génère les fiches actives dans siti/
 npm run genera -- --solo la-pelucchiera,pet-club
+npm run genera -- --tutti   # y compris les fiches écartées
 npm run genera -- --pulisci # vide siti/ d'abord
 npm run serve               # http://localhost:4173/ + adresse LAN pour le téléphone
 ```
 
 `npm run genera` affiche pour chaque client les champs manquants (téléphone,
-horaires, avis) et donc les sections qui seront masquées — c'est la liste des
-questions à poser en boutique.
+horaires, avis, partita IVA) et donc les sections qui seront masquées — c'est
+la liste des questions à poser en boutique.
+
+Les fiches dont le `stato` commence par `escluso` sont sautées et listées à
+part : elles restent dans le fichier (un commerce présent sur un agrégateur
+n'est pas un mauvais prospect, c'est un autre argumentaire) mais ne partent
+pas dans la tournée. `--solo` reste prioritaire sur le statut, `--tutti` les
+réintègre toutes.
 
 ## Le template
 
